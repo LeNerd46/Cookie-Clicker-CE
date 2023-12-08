@@ -93,6 +93,8 @@ int main(void)
 		dbg_printf("Cookies Per Second: %f\n", cps);
 
 		// Store Icons
+
+		//Cursor
 		gfx_SetColor(0x93);
 		gfx_FillRectangle(225, 60, 95, 25);
 		gfx_PrintStringXY("Cursor", 232, 65);
@@ -104,7 +106,6 @@ int main(void)
 		gfx_PrintUInt(cursorPrice, 1);
 
 		// Grandma
-
 		gfx_FillRectangle(225, 90, 95, 25);
 		gfx_PrintStringXY("Grandma", 232, 95);
 
