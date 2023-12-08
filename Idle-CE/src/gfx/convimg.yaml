@@ -1,0 +1,23 @@
+palettes:
+  - name: mypalette
+    fixed-entries:
+      - color: { index: 0, r: 163, g: 73, b: 164 }
+    images: automatic
+
+converts:
+  - name: myimages
+    palette: mypalette
+    transparent-color-index: 0
+    style: rlet
+    images:
+      - Pictures/cursor.png
+      - Pictures/cookie.png
+      - Pictures/Upgrades/cursorUpgradeNew.png
+
+outputs:
+  - type: c
+    include-file: gfx.h
+    palettes:
+      - mypalette
+    converts:
+      - myimages

@@ -1,0 +1,9 @@
+mypalette.h
+mypalette.c
+cursor.h
+cursor.c
+cookie.h
+cookie.c
+cursorUpgradeNew.h
+cursorUpgradeNew.c
+gfx.h
