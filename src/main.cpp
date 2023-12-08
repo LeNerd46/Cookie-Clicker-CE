@@ -25,6 +25,9 @@ int main(void)
 	unsigned int cookies = 0;
 	float cps = 0;
 
+	int cpsBase = 0;
+	int cpsDecimal = 0;
+
 	unsigned int cursorsOwned = 0;
 	unsigned int cursorPrice = 15;
 
@@ -36,7 +39,6 @@ int main(void)
 	// Maybe have a cursor and hold down a button to make the cursor move faster
 	// (If you want to go from one side of the screen to another, it would take a while normally but you want it to move slowly too so you have control when you're trying to press something)
 
-
 	do
 	{
 		kb_Scan();
@@ -45,7 +47,13 @@ int main(void)
 		clock_t now = clock();
 		float elapsedTime = (now - lastUpdate) / (float)CLOCKS_PER_SEC;
 
-		float earnedCookies = elapsedTime * cps;
+		if (cpsDecimal >= 10)
+		{
+			cpsDecimal = 0;
+			cpsBase++;
+		}
+
+		float earnedCookies = elapsedTime * (cpsBase + cpsDecimal / static_cast<float>(10));
 
 		if (earnedCookies >= 1)
 		{
@@ -58,6 +66,11 @@ int main(void)
 
 		gfx_SetTextFGColor(0xFB);
 
+		// Line Separators
+		gfx_SetColor(0x61);
+		gfx_FillRectangle(100, 0, 5, 240);
+		gfx_FillRectangle(220, 0, 5, 240);
+
 		// Cookie Count
 		gfx_SetTextXY(15, 40);
 		gfx_PrintUInt(cookies, 1);
@@ -67,15 +80,17 @@ int main(void)
 		// gfx_SetTextScale(3, 3);
 		gfx_PrintString(" cookies");
 		gfx_PrintStringXY("per second: ", 10, 50);
-		gfx_PrintInt((int)cps, 1);
+		gfx_PrintInt(cpsBase, 1);
+
+		if (cpsDecimal != 0)
+		{
+			gfx_PrintChar('.');
+			gfx_PrintInt(cpsDecimal, 1);
+		}
+
 		gfx_PrintStringXY("Store", 255, 15);
 
 		dbg_printf("Cookies Per Second: %f\n", cps);
-
-		// Line Separators
-		gfx_SetColor(0x61);
-		gfx_FillRectangle(100, 0, 5, 240);
-		gfx_FillRectangle(220, 0, 5, 240);
 
 		// Store Icons
 		gfx_SetColor(0x93);
@@ -116,27 +131,27 @@ int main(void)
 
 		if (pressed && !previousPress)
 		{
-			if (checkCollision(x, y, 7, 11, 20, 80, 60, 60))
+			if (checkCollision(x, y, 3, 3, 20, 80, 60, 60))
 				cookies++;
-			else if (checkCollision(x, y, 7, 11, 225, 60, 95, 25))
+			else if (checkCollision(x, y, 3, 3, 225, 60, 95, 25))
 			{
 				if (cookies >= cursorPrice)
 				{
 					cursorsOwned++;
 					cookies -= cursorPrice;
 					cursorPrice = 15 * pow(1.15, cursorsOwned) + 1;
-					cps += 0.1;
+					cpsDecimal++;
 					cps = roundf(cps * 10) / 10;
 				}
 			}
-			else if (checkCollision(x, y, 7, 11, 225, 90, 95, 25))
+			else if (checkCollision(x, y, 3, 3, 225, 90, 95, 25))
 			{
 				if (cookies >= grandmaPrice)
 				{
 					grandmasOwned++;
 					cookies -= grandmaPrice;
 					grandmaPrice = 100 * pow(1.15, grandmasOwned) + 1;
-					cps += 1;
+					cpsBase += 1;
 				}
 			}
 		}
