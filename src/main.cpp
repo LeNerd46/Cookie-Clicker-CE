@@ -15,25 +15,52 @@ int main(void)
 	gfx_SetTextFGColor(0xE0);
 	gfx_SetPalette(mypalette, sizeof_mypalette, 0);
 
+	//Mouse Position
 	int x = 150;
 	int y = 200;
 
+	//Ingame Cursor Speed
 	unsigned int speed = 1;
 	bool pressed = false;
 	bool previousPress = false;
 
+	//Visual Variables
 	unsigned int cookies = 0;
-	float cps = 0;
 
+	//False Decimal CPS
 	int cpsBase = 0;
 	int cpsDecimal = 0;
 
+
+	//Cursor
 	unsigned int cursorsOwned = 0;
 	unsigned int cursorPrice = 15;
 
+	//Grandma
 	unsigned int grandmasOwned = 0;
 	unsigned int grandmaPrice = 100;
 
+	//Farm
+	unsigned int farmsOwned = 0;
+	unsigned int farmPrice = 1100;
+
+	//Mine
+	unsigned int minesOwned = 0;
+	unsigned int minePrice = 12000;
+
+	//Factory
+	unsigned int factoriesOwned = 0;
+	unsigned int factoryPrice = 130000;
+
+	//Bank
+	unsigned int banksOwned = 0;
+	unsigned int bankPrice = 1000000;
+
+	//Temple
+	unsigned int templesOwned = 0;
+	long int templePrice = 20000000;
+
+	//Time
 	clock_t lastUpdate = clock();
 
 	// Maybe have a cursor and hold down a button to make the cursor move faster
@@ -77,7 +104,6 @@ int main(void)
 
 		// Text
 		gfx_SetTextFGColor(0xFE);
-		// gfx_SetTextScale(3, 3);
 		gfx_PrintString(" cookies");
 		gfx_PrintStringXY("per second: ", 10, 50);
 		gfx_PrintInt(cpsBase, 1);
@@ -88,13 +114,17 @@ int main(void)
 			gfx_PrintInt(cpsDecimal, 1);
 		}
 
-		gfx_PrintStringXY("Store", 255, 15);
+		//dbg_printf("Cookies Per Second: %f\n", cps);
 
-		dbg_printf("Cookies Per Second: %f\n", cps);
 
-		
-		// Store Icons
+
+		//Store
 		gfx_SetColor(0x93);
+
+
+		//Upgrades
+		gfx_FillRectangle(225, 30, 95, 25);
+
 		
 		//Cursor
 		gfx_FillRectangle(225, 60, 95, 25);
@@ -103,19 +133,85 @@ int main(void)
 		gfx_SetTextXY(305, 65);
 		gfx_PrintUInt(cursorsOwned, 1);
 
-		gfx_SetTextXY(235, 75);
+		gfx_SetTextXY(232, 75);
 		gfx_PrintUInt(cursorPrice, 1);
 
-		// Grandma
-		gfx_FillRectangle(225, 90, 95, 25);
-		gfx_PrintStringXY("Grandma", 232, 95);
 
-		gfx_SetTextXY(305, 95);
+		// Grandma
+		gfx_FillRectangle(225, 88, 95, 25);
+		gfx_PrintStringXY("Grandma", 232, 93);
+
+		gfx_SetTextXY(305, 93);
 		gfx_PrintUInt(grandmasOwned, 1);
 
-		gfx_SetTextXY(235, 105);
+		gfx_SetTextXY(232, 103);
 		gfx_PrintUInt(grandmaPrice, 1);
 
+
+		//Farm
+		gfx_FillRectangle(225, 116, 95, 25);
+		gfx_PrintStringXY("Farm", 232, 121);
+
+		gfx_SetTextXY(305, 121);
+		gfx_PrintUInt(farmsOwned, 1);
+
+		gfx_SetTextXY(232, 131);
+		gfx_PrintUInt(farmPrice, 1);
+
+
+		//Mine
+		gfx_FillRectangle(225, 144, 95, 25);
+		gfx_PrintStringXY("Mine", 232, 149);
+
+		gfx_SetTextXY(305, 149);
+		gfx_PrintUInt(minesOwned, 1);
+
+		gfx_SetTextXY(232, 159);
+		gfx_PrintUInt(minePrice, 1);
+
+
+		//Factory
+		gfx_FillRectangle(225, 172, 95, 25);
+		gfx_PrintStringXY("Factory", 232, 177);
+
+		gfx_SetTextXY(305, 177);
+		gfx_PrintUInt(factoriesOwned, 1);
+
+		gfx_SetTextXY(232, 187);
+		gfx_PrintUInt(factoryPrice, 1);
+
+
+		//Bank
+		gfx_FillRectangle(225, 200, 95, 25);
+		gfx_PrintStringXY("Bank", 232, 205);
+
+		gfx_SetTextXY(305, 205);
+		gfx_PrintUInt(banksOwned, 1);
+
+		gfx_SetTextXY(232, 215);
+		gfx_PrintUInt(bankPrice, 1);
+
+
+		//Temple
+		gfx_FillRectangle(225, 228, 95, 25);
+		gfx_PrintStringXY("Temple", 232, 233);
+
+		gfx_SetTextXY(305, 233);
+		gfx_PrintUInt(templesOwned, 1);
+		
+		gfx_SetTextXY(232, 243);
+		gfx_PrintUInt(templePrice, 1);
+
+
+
+		//Store Icon
+		gfx_SetColor(0xC7);
+		gfx_FillRectangle(225, 15, 95, 25);
+		gfx_PrintStringXY("Store", 255, 15);
+
+
+
+		//Screen Cursor
 		if (kb_IsDown(kb_KeyAlpha))
 			speed = 5;
 		else
@@ -131,29 +227,75 @@ int main(void)
 		else if (kb_IsDown(kb_KeyDown))
 			y < 240 ? y += speed : y = 240;
 
+		//Pressed 2nd
 		if (pressed && !previousPress)
 		{
 			if (checkCollision(x, y, 3, 3, 20, 80, 60, 60))
+				//Cookie
 				cookies++;
-			else if (checkCollision(x, y, 3, 3, 225, 60, 95, 25))
-			{
+			else if (checkCollision(x, y, 3, 3, 225, 60, 95, 25)) {
+				//Cursor
 				if (cookies >= cursorPrice)
 				{
 					cursorsOwned++;
 					cookies -= cursorPrice;
 					cursorPrice = 15 * pow(1.15, cursorsOwned) + 1;
 					cpsDecimal++;
-					cps = roundf(cps * 10) / 10;
 				}
 			}
-			else if (checkCollision(x, y, 3, 3, 225, 90, 95, 25))
-			{
+			else if (checkCollision(x, y, 3, 3, 225, 90, 95, 25)) {
+				//Grandma
 				if (cookies >= grandmaPrice)
 				{
 					grandmasOwned++;
 					cookies -= grandmaPrice;
 					grandmaPrice = 100 * pow(1.15, grandmasOwned) + 1;
 					cpsBase += 1;
+				}
+			}
+			else if (checkCollision(x, y, 3, 3, 225, 120, 95, 25)) {
+				//Farm
+				if (cookies >= farmPrice) {
+					farmsOwned++;
+					cookies -= farmPrice;
+					farmPrice = 1100 * pow(1.15, farmsOwned) + 1;
+					cpsBase += 8;
+				}
+			}
+			else if (checkCollision(x, y, 3, 3, 225, 150, 95, 25)) {
+				//Mine
+				if (cookies >= minePrice) {
+					minesOwned++;
+					cookies -= minePrice;
+					minePrice = 12000 * pow(1.15, minesOwned) + 1;
+					cpsBase += 47;
+				}
+			}
+			else if (checkCollision(x, y, 3, 3, 225, 180, 95, 25)) {
+				//Factory
+				if (cookies >= factoryPrice) {
+					factoriesOwned++;
+					cookies -= factoryPrice;
+					factoryPrice = 130000 * pow(1.15, factoriesOwned) + 1;
+					cpsBase += 260;
+				}
+			}
+			else if (checkCollision(x, y, 3, 3, 255, 210, 95, 25)) {
+				//Bank
+				if (cookies >= bankPrice) {
+					banksOwned++;
+					cookies -= bankPrice;
+					bankPrice = 1400000 * pow(1.15, banksOwned) + 1;
+					cpsBase += 1400;
+				}
+			}
+			else if (checkCollision(x, y, 3, 3, 225, 240, 95, 25)) {
+				//Temple
+				if (cookies >= templePrice) {
+					templesOwned++;
+					cookies -= templePrice;
+					templePrice = 20000000 * pow(1.15, templesOwned) + 1;
+					cpsBase += 7800;
 				}
 			}
 		}
