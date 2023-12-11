@@ -10,6 +10,8 @@ extern "C" {
 #include "cursor.h"
 #include "cookie.h"
 #include "cursorUpgradeNew.h"
+#include "plainCursor.h"
+#include "cursorUpgradePink.h"
 
 #ifdef __cplusplus
 }

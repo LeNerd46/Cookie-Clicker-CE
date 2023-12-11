@@ -13,6 +13,8 @@ converts:
       - Pictures/cursor.png
       - Pictures/cookie.png
       - Pictures/Upgrades/cursorUpgradeNew.png
+      - Pictures/Upgrades/plainCursor.png
+      - Pictures/Upgrades/cursorUpgradePink.png
 
 outputs:
   - type: c

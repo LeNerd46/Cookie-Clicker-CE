@@ -6,4 +6,8 @@ cookie.h
 cookie.c
 cursorUpgradeNew.h
 cursorUpgradeNew.c
+plainCursor.h
+plainCursor.c
+cursorUpgradePink.h
+cursorUpgradePink.c
 gfx.h

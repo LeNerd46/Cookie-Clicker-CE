@@ -6,6 +6,7 @@
 #include <math.h>
 #include <time.h>
 #include <debug.h>
+#include "upgrade.h"
 
 int main(void)
 {
@@ -15,56 +16,58 @@ int main(void)
 	gfx_SetTextFGColor(0xE0);
 	gfx_SetPalette(mypalette, sizeof_mypalette, 0);
 
-	//Mouse Position
 	int x = 150;
 	int y = 200;
 
-	//Ingame Cursor Speed
-	unsigned int speed = 1;
+	unsigned int speed = 3;
 	bool pressed = false;
 	bool previousPress = false;
 
-	//Visual Variables
 	unsigned int cookies = 0;
+	unsigned int clickAmount = 1;
 
-	//False Decimal CPS
 	int cpsBase = 0;
 	int cpsDecimal = 0;
 
-
-	//Cursor
 	unsigned int cursorsOwned = 0;
 	unsigned int cursorPrice = 15;
+	unsigned int cursorCps = 1;
 
-	//Grandma
 	unsigned int grandmasOwned = 0;
 	unsigned int grandmaPrice = 100;
+	unsigned int grandmaCps = 1;
 
-	//Farm
 	unsigned int farmsOwned = 0;
 	unsigned int farmPrice = 1100;
 
-	//Mine
 	unsigned int minesOwned = 0;
 	unsigned int minePrice = 12000;
 
-	//Factory
 	unsigned int factoriesOwned = 0;
 	unsigned int factoryPrice = 130000;
 
-	//Bank
 	unsigned int banksOwned = 0;
 	unsigned int bankPrice = 1000000;
 
-	//Temple
 	unsigned int templesOwned = 0;
 	long int templePrice = 20000000;
 
-	//Time
 	clock_t lastUpdate = clock();
 
 	// Maybe have a cursor and hold down a button to make the cursor move faster
 	// (If you want to go from one side of the screen to another, it would take a while normally but you want it to move slowly too so you have control when you're trying to press something)
+
+	// Upgrades
+	unsigned char amountOfUpgrades = 0;
+
+	Upgrade reinforcedIndexFinger(100, "Reinforced Index Finger", "The mouse and cursors are twice as efficient", "prod prod", 0, plainCursor, 1);
+	Upgrade carpalTunnelPreventionCream(500, "Carpal tunnel prevention cream", "The mouse are cursors are twice as efficient", "it... it hurts to click...", 0, cursorUpgradePink, 2);
+	Upgrade ambidextrous(10000, "Ambidextrous", "The mouse and cursors are twice as efficient", "Look ma, both hands!", 0, cursorUpgradePink, 3);
+
+	Upgrade forwardsFromGrandma(1000, "Forwards from grandma", "Grandmas are twice as efficient", "RE:RE:thought you'd get a kick out of this ;))", 0, plainCursor, 4);
+	Upgrade steelPLatedRollingPins(5000, "Steel-plated rolling pins", "Grandmas are twice as efficient", "Just what you kneaded", 0, plainCursor, 5);
+
+	UpgradeManager upgrades(10);
 
 	do
 	{
@@ -76,7 +79,7 @@ int main(void)
 
 		if (cpsDecimal >= 10)
 		{
-			cpsDecimal = 0;
+			cpsDecimal -= 10;
 			cpsBase++;
 		}
 
@@ -114,19 +117,15 @@ int main(void)
 			gfx_PrintInt(cpsDecimal, 1);
 		}
 
-		//dbg_printf("Cookies Per Second: %f\n", cps);
+		gfx_PrintStringXY("Store", 255, 15);
 
-
-
-		//Store
+		// Store Icons
 		gfx_SetColor(0x93);
 
-
 		//Upgrades
-		gfx_FillRectangle(225, 30, 95, 25);
+		gfx_FillRectangle(225, 15, 95, 25);
 
-		
-		//Cursor
+		// Cursor
 		gfx_FillRectangle(225, 60, 95, 25);
 		gfx_PrintStringXY("Cursor", 232, 65);
 
@@ -135,7 +134,6 @@ int main(void)
 
 		gfx_SetTextXY(232, 75);
 		gfx_PrintUInt(cursorPrice, 1);
-
 
 		// Grandma
 		gfx_FillRectangle(225, 88, 95, 25);
@@ -147,8 +145,7 @@ int main(void)
 		gfx_SetTextXY(232, 103);
 		gfx_PrintUInt(grandmaPrice, 1);
 
-
-		//Farm
+		// Farm
 		gfx_FillRectangle(225, 116, 95, 25);
 		gfx_PrintStringXY("Farm", 232, 121);
 
@@ -158,8 +155,7 @@ int main(void)
 		gfx_SetTextXY(232, 131);
 		gfx_PrintUInt(farmPrice, 1);
 
-
-		//Mine
+		// Mine
 		gfx_FillRectangle(225, 144, 95, 25);
 		gfx_PrintStringXY("Mine", 232, 149);
 
@@ -169,8 +165,7 @@ int main(void)
 		gfx_SetTextXY(232, 159);
 		gfx_PrintUInt(minePrice, 1);
 
-
-		//Factory
+		// Factory
 		gfx_FillRectangle(225, 172, 95, 25);
 		gfx_PrintStringXY("Factory", 232, 177);
 
@@ -180,8 +175,7 @@ int main(void)
 		gfx_SetTextXY(232, 187);
 		gfx_PrintUInt(factoryPrice, 1);
 
-
-		//Bank
+		// Bank
 		gfx_FillRectangle(225, 200, 95, 25);
 		gfx_PrintStringXY("Bank", 232, 205);
 
@@ -191,31 +185,26 @@ int main(void)
 		gfx_SetTextXY(232, 215);
 		gfx_PrintUInt(bankPrice, 1);
 
-
-		//Temple
+		// Temple
 		gfx_FillRectangle(225, 228, 95, 25);
 		gfx_PrintStringXY("Temple", 232, 233);
 
 		gfx_SetTextXY(305, 233);
 		gfx_PrintUInt(templesOwned, 1);
-		
+
 		gfx_SetTextXY(232, 243);
 		gfx_PrintUInt(templePrice, 1);
 
-
-
-		//Store Icon
+		// Store Icon
 		gfx_SetColor(0xC7);
 		gfx_FillRectangle(225, 15, 95, 25);
 		gfx_PrintStringXY("Store", 255, 15);
 
-
-
-		//Screen Cursor
+		// Screen Cursor
 		if (kb_IsDown(kb_KeyAlpha))
-			speed = 5;
+			speed = 8;
 		else
-			speed = 1;
+			speed = 3;
 
 		if (kb_IsDown(kb_KeyLeft))
 			x > 0 ? x -= speed : x = 0;
@@ -227,71 +216,94 @@ int main(void)
 		else if (kb_IsDown(kb_KeyDown))
 			y < 240 ? y += speed : y = 240;
 
-		//Pressed 2nd
 		if (pressed && !previousPress)
 		{
 			if (checkCollision(x, y, 3, 3, 20, 80, 60, 60))
-				//Cookie
-				cookies++;
-			else if (checkCollision(x, y, 3, 3, 225, 60, 95, 25)) {
-				//Cursor
+				cookies += clickAmount;
+			else if (checkCollision(x, y, 3, 3, 225, 60, 95, 25))
+			{
 				if (cookies >= cursorPrice)
 				{
 					cursorsOwned++;
 					cookies -= cursorPrice;
 					cursorPrice = 15 * pow(1.15, cursorsOwned) + 1;
-					cpsDecimal++;
+					cpsDecimal += cursorCps;
+
+					if (cursorsOwned == 1)
+					{
+						upgrades.addUpgrade(reinforcedIndexFinger);
+						upgrades.addUpgrade(carpalTunnelPreventionCream);
+					}
+					else if (cursorsOwned == 10)
+						upgrades.addUpgrade(ambidextrous);
 				}
 			}
-			else if (checkCollision(x, y, 3, 3, 225, 90, 95, 25)) {
-				//Grandma
+			else if (checkCollision(x, y, 3, 3, 225, 90, 95, 25)) 
+			{
+				// Grandma
+
 				if (cookies >= grandmaPrice)
 				{
 					grandmasOwned++;
 					cookies -= grandmaPrice;
 					grandmaPrice = 100 * pow(1.15, grandmasOwned) + 1;
 					cpsBase += 1;
+
+					if (grandmasOwned == 1)
+						upgrades.addUpgrade(forwardsFromGrandma);
+					else if (grandmasOwned == 5)
+						upgrades.addUpgrade(steelPLatedRollingPins);
 				}
 			}
-			else if (checkCollision(x, y, 3, 3, 225, 120, 95, 25)) {
-				//Farm
-				if (cookies >= farmPrice) {
+			else if (checkCollision(x, y, 3, 3, 225, 120, 95, 25)) 
+			{
+				// Farm
+				if (cookies >= farmPrice) 
+				{
 					farmsOwned++;
 					cookies -= farmPrice;
 					farmPrice = 1100 * pow(1.15, farmsOwned) + 1;
 					cpsBase += 8;
 				}
 			}
-			else if (checkCollision(x, y, 3, 3, 225, 150, 95, 25)) {
-				//Mine
-				if (cookies >= minePrice) {
+			else if (checkCollision(x, y, 3, 3, 225, 150, 95, 25))
+			{
+				// Mine
+				if (cookies >= minePrice) 
+				{
 					minesOwned++;
 					cookies -= minePrice;
 					minePrice = 12000 * pow(1.15, minesOwned) + 1;
 					cpsBase += 47;
 				}
 			}
-			else if (checkCollision(x, y, 3, 3, 225, 180, 95, 25)) {
-				//Factory
-				if (cookies >= factoryPrice) {
+			else if (checkCollision(x, y, 3, 3, 225, 180, 95, 25)) 
+			{
+				// Factory
+				if (cookies >= factoryPrice) 
+				{
 					factoriesOwned++;
 					cookies -= factoryPrice;
 					factoryPrice = 130000 * pow(1.15, factoriesOwned) + 1;
 					cpsBase += 260;
 				}
 			}
-			else if (checkCollision(x, y, 3, 3, 255, 210, 95, 25)) {
-				//Bank
-				if (cookies >= bankPrice) {
+			else if (checkCollision(x, y, 3, 3, 255, 210, 95, 25)) 
+			{
+				// Bank
+				if (cookies >= bankPrice) 
+				{
 					banksOwned++;
 					cookies -= bankPrice;
 					bankPrice = 1400000 * pow(1.15, banksOwned) + 1;
 					cpsBase += 1400;
 				}
 			}
-			else if (checkCollision(x, y, 3, 3, 225, 240, 95, 25)) {
-				//Temple
-				if (cookies >= templePrice) {
+			else if (checkCollision(x, y, 3, 3, 225, 240, 95, 25)) 
+			{
+				// Temple
+				if (cookies >= templePrice) 
+				{
 					templesOwned++;
 					cookies -= templePrice;
 					templePrice = 20000000 * pow(1.15, templesOwned) + 1;
@@ -300,9 +312,53 @@ int main(void)
 			}
 		}
 
+		unsigned int startX = 225;
+		unsigned int startY = 30;
+
+		for (unsigned char i = 0; i < upgrades.count(); i++)
+		{
+			Upgrade upgrade = upgrades.getUpgrade(i);
+
+			gfx_SetColor(0x61);
+			gfx_Rectangle(startX, startY, 17, 17);
+			gfx_RLETSprite(upgrade.icon, startX + 1, startY + 1);
+
+			if (checkCollision(x, y, 1, 1, startX, startY, 17, 17))
+			{
+				if (pressed && !previousPress && cookies >= upgrade.price)
+				{
+					cookies -= upgrade.price;
+					upgrade.purchased = true;
+
+					if (upgrade.id == 1 || upgrade.id == 2) 
+					{
+						cpsDecimal *= 2;
+						cursorCps *= 2;
+						clickAmount *= 2;
+					}
+					else if (upgrade.id == 4 || upgrade.id == 5)
+						grandmaCps *= 2;
+
+					upgrades.removeUpgrade(i);
+				}
+				else
+				{
+					gfx_SetColor(0x45);
+					gfx_FillRectangle(120, 15, 105, 50);
+					gfx_PrintStringXY(upgrade.name, 122, 17);
+					gfx_SetTextXY(122, 50);
+					gfx_PrintUInt(upgrade.price, 1);
+					gfx_PrintString(" cookies");
+				}
+			}
+
+			startX += 17;
+		}
+
 		gfx_RLETSprite(cookie, 20, 80);
 		gfx_RLETSprite(cursorUpgradeNew, 50, 145);
 		gfx_RLETSprite(cursor, x, y);
+
 		previousPress = pressed;
 
 		gfx_BlitBuffer();
