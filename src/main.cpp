@@ -7,9 +7,33 @@
 #include <time.h>
 #include <debug.h>
 #include "upgrade.h"
+#include <cstdlib>
 
 int main(void)
 {
+	FILE* file = fopen("ccstor", "r");
+
+	if (file)
+	{
+		loadOrCreateSave(file);
+		fclose(file);
+	}
+	else
+	{
+		cookies = 0;
+		cpsBase = 0;
+		cpsDecimal = 0;
+		clickAmount = 1;
+
+		cursorsOwned = 0;
+		cursorPrice = 15;
+		cursorCps = 1;
+
+		grandmasOwned = 0;
+		grandmaPrice = 100;
+		grandmaCps = 1;
+	}
+
 	gfx_Begin();
 	gfx_SetDrawBuffer();
 	gfx_SetColor(0xE0);
@@ -23,19 +47,8 @@ int main(void)
 	bool pressed = false;
 	bool previousPress = false;
 
-	unsigned int cookies = 0;
-	unsigned int clickAmount = 1;
-
-	int cpsBase = 0;
-	int cpsDecimal = 0;
-
-	unsigned int cursorsOwned = 0;
-	unsigned int cursorPrice = 15;
-	unsigned int cursorCps = 1;
-
-	unsigned int grandmasOwned = 0;
-	unsigned int grandmaPrice = 100;
-	unsigned int grandmaCps = 1;
+	bool savePress = false;
+	bool previousSavePress = false;
 
 	unsigned int farmsOwned = 0;
 	unsigned int farmPrice = 1100;
@@ -58,16 +71,12 @@ int main(void)
 	// (If you want to go from one side of the screen to another, it would take a while normally but you want it to move slowly too so you have control when you're trying to press something)
 
 	// Upgrades
-	unsigned char amountOfUpgrades = 0;
-
 	Upgrade reinforcedIndexFinger(100, "Reinforced Index Finger", "The mouse and cursors are twice as efficient", "prod prod", 0, plainCursor, 1);
 	Upgrade carpalTunnelPreventionCream(500, "Carpal tunnel prevention cream", "The mouse are cursors are twice as efficient", "it... it hurts to click...", 0, cursorUpgradePink, 2);
 	Upgrade ambidextrous(10000, "Ambidextrous", "The mouse and cursors are twice as efficient", "Look ma, both hands!", 0, cursorUpgradePink, 3);
 
 	Upgrade forwardsFromGrandma(1000, "Forwards from grandma", "Grandmas are twice as efficient", "RE:RE:thought you'd get a kick out of this ;))", 0, plainCursor, 4);
 	Upgrade steelPLatedRollingPins(5000, "Steel-plated rolling pins", "Grandmas are twice as efficient", "Just what you kneaded", 0, plainCursor, 5);
-
-	UpgradeManager upgrades(10);
 
 	do
 	{
@@ -93,6 +102,7 @@ int main(void)
 		}
 
 		pressed = kb_IsDown(kb_Key2nd);
+		savePress = kb_IsDown(kb_KeyEnter);
 
 		gfx_SetTextFGColor(0xFB);
 
@@ -200,11 +210,35 @@ int main(void)
 		gfx_FillRectangle(225, 15, 95, 25);
 		gfx_PrintStringXY("Store", 255, 15);
 
-		// Screen Cursor
 		if (kb_IsDown(kb_KeyAlpha))
 			speed = 8;
 		else
 			speed = 3;
+
+		if (kb_IsDown(kb_Key2))
+			clickAmount = 1;
+
+		if (savePress && !previousSavePress)
+		{
+			FILE* file = fopen("ccstor", "w");
+
+			if (file)
+			{
+				save(file);
+				fclose(file);
+			}
+		}
+
+		if (kb_IsDown(kb_KeyDel))
+		{
+			remove("ccstor");
+			gfx_End();
+
+			return 0;
+		}
+
+		// if (kb_IsDown(kb_Key1))
+			// loadOrCreateSave();
 
 		if (kb_IsDown(kb_KeyLeft))
 			x > 0 ? x -= speed : x = 0;
@@ -231,14 +265,14 @@ int main(void)
 
 					if (cursorsOwned == 1)
 					{
-						upgrades.addUpgrade(reinforcedIndexFinger);
-						upgrades.addUpgrade(carpalTunnelPreventionCream);
+						upgrades.add(reinforcedIndexFinger);
+						upgrades.add(carpalTunnelPreventionCream);
 					}
 					else if (cursorsOwned == 10)
-						upgrades.addUpgrade(ambidextrous);
+						upgrades.add(ambidextrous);
 				}
 			}
-			else if (checkCollision(x, y, 3, 3, 225, 90, 95, 25)) 
+			else if (checkCollision(x, y, 3, 3, 225, 90, 95, 25))
 			{
 				// Grandma
 
@@ -247,18 +281,18 @@ int main(void)
 					grandmasOwned++;
 					cookies -= grandmaPrice;
 					grandmaPrice = 100 * pow(1.15, grandmasOwned) + 1;
-					cpsBase += 1;
+					cpsBase += grandmaCps;
 
 					if (grandmasOwned == 1)
-						upgrades.addUpgrade(forwardsFromGrandma);
+						upgrades.add(forwardsFromGrandma);
 					else if (grandmasOwned == 5)
-						upgrades.addUpgrade(steelPLatedRollingPins);
+						upgrades.add(steelPLatedRollingPins);
 				}
 			}
-			else if (checkCollision(x, y, 3, 3, 225, 120, 95, 25)) 
+			else if (checkCollision(x, y, 3, 3, 225, 120, 95, 25))
 			{
 				// Farm
-				if (cookies >= farmPrice) 
+				if (cookies >= farmPrice)
 				{
 					farmsOwned++;
 					cookies -= farmPrice;
@@ -269,7 +303,7 @@ int main(void)
 			else if (checkCollision(x, y, 3, 3, 225, 150, 95, 25))
 			{
 				// Mine
-				if (cookies >= minePrice) 
+				if (cookies >= minePrice)
 				{
 					minesOwned++;
 					cookies -= minePrice;
@@ -277,10 +311,10 @@ int main(void)
 					cpsBase += 47;
 				}
 			}
-			else if (checkCollision(x, y, 3, 3, 225, 180, 95, 25)) 
+			else if (checkCollision(x, y, 3, 3, 225, 180, 95, 25))
 			{
 				// Factory
-				if (cookies >= factoryPrice) 
+				if (cookies >= factoryPrice)
 				{
 					factoriesOwned++;
 					cookies -= factoryPrice;
@@ -288,10 +322,10 @@ int main(void)
 					cpsBase += 260;
 				}
 			}
-			else if (checkCollision(x, y, 3, 3, 255, 210, 95, 25)) 
+			else if (checkCollision(x, y, 3, 3, 255, 210, 95, 25))
 			{
 				// Bank
-				if (cookies >= bankPrice) 
+				if (cookies >= bankPrice)
 				{
 					banksOwned++;
 					cookies -= bankPrice;
@@ -299,10 +333,10 @@ int main(void)
 					cpsBase += 1400;
 				}
 			}
-			else if (checkCollision(x, y, 3, 3, 225, 240, 95, 25)) 
+			else if (checkCollision(x, y, 3, 3, 225, 240, 95, 25))
 			{
 				// Temple
-				if (cookies >= templePrice) 
+				if (cookies >= templePrice)
 				{
 					templesOwned++;
 					cookies -= templePrice;
@@ -317,7 +351,7 @@ int main(void)
 
 		for (unsigned char i = 0; i < upgrades.count(); i++)
 		{
-			Upgrade upgrade = upgrades.getUpgrade(i);
+			Upgrade upgrade = upgrades.get(i);
 
 			gfx_SetColor(0x61);
 			gfx_Rectangle(startX, startY, 17, 17);
@@ -330,7 +364,7 @@ int main(void)
 					cookies -= upgrade.price;
 					upgrade.purchased = true;
 
-					if (upgrade.id == 1 || upgrade.id == 2) 
+					if (upgrade.id == 1 || upgrade.id == 2)
 					{
 						cpsDecimal *= 2;
 						cursorCps *= 2;
@@ -339,7 +373,7 @@ int main(void)
 					else if (upgrade.id == 4 || upgrade.id == 5)
 						grandmaCps *= 2;
 
-					upgrades.removeUpgrade(i);
+					upgrades.remove(i);
 				}
 				else
 				{
@@ -360,6 +394,7 @@ int main(void)
 		gfx_RLETSprite(cursor, x, y);
 
 		previousPress = pressed;
+		previousSavePress = savePress;
 
 		gfx_BlitBuffer();
 
@@ -374,4 +409,32 @@ bool checkCollision(int firstX, int firstY, int firstWidth, int firstHeight, int
 		&& firstX + firstWidth > secondX // First object's right side is to the right of the second object's left side,         first object is on the left
 		&& firstY < secondY + secondHeight // The first object's top is above the second object's bottom,                       first object is underneath
 		&& firstY + firstHeight > secondY; // The first object's bottom is lower than the second object's top,                  first object is above
+}
+
+#define TO_SERIALIZE(F) \
+    F(cookies) \
+    F(cpsBase) \
+    F(cpsDecimal) \
+    F(clickAmount) \
+	F(cursorsOwned) \
+	F(cursorPrice) \
+	F(cursorCps) \
+	F(grandmasOwned) \
+	F(grandmaPrice) \
+	F(grandmaCps) \
+	F(upgrades) \
+
+#define SERIALIZE(var) fread(&(var), sizeof(var), 1, file);
+#define DESERIALIZE(var) fwrite(&(var), sizeof(var), 1, file);
+
+#define NO_OPT __attribute__ ((optnone))
+
+void loadOrCreateSave(FILE* file) NO_OPT
+{
+	TO_SERIALIZE(SERIALIZE);
+}
+
+void save(FILE* file) NO_OPT
+{
+	TO_SERIALIZE(DESERIALIZE);
 }

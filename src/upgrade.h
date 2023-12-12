@@ -1,6 +1,7 @@
 #pragma once
 #include <stdlib.h>
 #include <graphx.h>
+#include <fileioc.h>
 
 struct Upgrade
 {
@@ -61,13 +62,16 @@ public:
 		free(upgrades);
 	}
 
-	void addUpgrade(const Upgrade& upgrade);
+	void add(const Upgrade& upgrade);
 
-	void removeUpgrade(unsigned char index);
+	void remove(unsigned char index);
 	
-	Upgrade& getUpgrade(unsigned char index) const;
+	Upgrade& get(unsigned char index) const;
 
 	unsigned char count() const;
+
+	bool save(FILE* file);
+	bool load(FILE* file);
 
 private:
 	Upgrade* upgrades;
