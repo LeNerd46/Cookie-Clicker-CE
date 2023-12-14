@@ -65,7 +65,7 @@ public:
 	void add(const Upgrade& upgrade);
 
 	void remove(unsigned char index);
-	
+
 	Upgrade& get(unsigned char index) const;
 
 	unsigned char count() const;
@@ -79,4 +79,66 @@ private:
 	int numUpgrades;
 
 	void reallocUpgradeArray(unsigned char newCapacity);
+};
+
+struct Number
+{
+	int decimals;
+	int hundreds;
+	int thousands;
+	int millions;
+	int billions;
+	int trillions;
+
+	// Add more later...
+
+	Number()
+	{
+		decimals = 0;
+		hundreds = 0;
+		thousands = 0;
+		millions = 0;
+		billions = 0;
+		trillions = 0;
+	}
+
+	Number(int decimals)
+	{
+		this->decimals = decimals;
+
+		hundreds = 0;
+		thousands = 0;
+		millions = 0;
+		billions = 0;
+		trillions = 0;
+	}
+
+	Number(int decimals, int hundreds)
+	{
+		this->decimals = decimals; 
+		this->hundreds = hundreds;
+
+		thousands = 0;
+		millions = 0;
+		billions = 0;
+		trillions = 0;
+	}
+
+	Number(int decimals, int hundreds, int thousands)
+	{
+		this->decimals = decimals;
+		this->hundreds = hundreds;
+		this->thousands = thousands;
+
+		millions = 0;
+		billions = 0;
+		trillions = 0;
+	}
+
+	void add(Number amount);
+	void sub(Number amount);
+	Number mult(Number amount);
+
+	char compareTo(Number amount);
+	void setValue(int decimals, int hundreds, int thousands, int millions, int billions, int trillions);
 };
